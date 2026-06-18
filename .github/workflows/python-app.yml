@@ -17,7 +17,4 @@ jobs:
                 if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
             - name: Run Tests
               run: |
-                python -c "print('Verifiyng the application\'s stabilityls
-                ')"
-
-# tr                
+                python -c "print('Verifiyng the application\'s stability')"              
