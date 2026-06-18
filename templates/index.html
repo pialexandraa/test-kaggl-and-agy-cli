@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BigQuery Release Notes Radar & Share</title>
+    
+    <!-- Google Fonts: Outfit (headings) & Inter (body text) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- CSS Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="glass-bg-glow glow-1"></div>
+    <div class="glass-bg-glow glow-2"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </div>
+                <div>
+                    <h1>BigQuery Release Notes Radar</h1>
+                    <p class="subtitle">Stay updated with the latest BigQuery changes and share them on X (Twitter)</p>
+                </div>
+            </div>
+            
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    <span id="last-updated-text">Syncing...</span>
+                </div>
+                <button id="btn-refresh" class="btn btn-secondary" title="Refresh Release Notes">
+                    <svg id="spinner-icon" class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.56-.56" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span>Refresh</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body -->
+        <main class="app-main">
+            <!-- Left Panel: Feed and Filters -->
+            <section class="feed-panel">
+                <div class="filter-card">
+                    <!-- Search Bar -->
+                    <div class="search-box">
+                        <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                        <input type="text" id="search-input" placeholder="Search updates (e.g. Gemini, partition, table)..." autocomplete="off">
+                        <button id="clear-search" class="clear-btn" style="display: none;">&times;</button>
+                    </div>
+
+                    <!-- Type Filter Chips -->
+                    <div class="filter-scroll-container">
+                        <div class="filter-chips" id="filter-chips-container">
+                            <button class="chip active" data-type="all">All Updates</button>
+                            <button class="chip" data-type="Feature" data-color="feature">Features</button>
+                            <button class="chip" data-type="Issue" data-color="issue">Issues</button>
+                            <button class="chip" data-type="Announcement" data-color="announcement">Announcements</button>
+                            <button class="chip" data-type="Change" data-color="change">Changes</button>
+                            <button class="chip" data-type="Deprecated" data-color="deprecated">Deprecated</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Release Notes Feed List -->
+                <div class="feed-container" id="feed-container">
+                    <div class="shimmer-placeholder">
+                        <div class="shimmer-card"></div>
+                        <div class="shimmer-card"></div>
+                        <div class="shimmer-card"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Panel: Selected Update Detail & Tweet Composer -->
+            <section class="detail-panel" id="detail-panel">
+                <!-- Empty State (Shown initially) -->
+                <div class="empty-detail-state" id="empty-detail-state">
+                    <div class="empty-icon-wrapper">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+                    <h2>No Update Selected</h2>
+                    <p>Select any release note card from the feed on the left to read details, compose, and send a tweet about it.</p>
+                </div>
+
+                <!-- Detail Content Container (Hidden until selected) -->
+                <div class="detail-content-wrapper" id="detail-content-wrapper" style="display: none;">
+                    <div class="detail-header-card">
+                        <div class="detail-meta">
+                            <span id="detail-badge" class="type-badge">Feature</span>
+                            <span id="detail-date" class="date-text">June 17, 2026</span>
+                        </div>
+                        <h2 id="detail-title">Update Details</h2>
+                        <div id="detail-body-html" class="detail-body-content">
+                            <!-- HTML content goes here -->
+                        </div>
+                    </div>
+
+                    <!-- Tweet Composer Box -->
+                    <div class="tweet-composer-card">
+                        <div class="composer-header">
+                            <div class="composer-title-group">
+                                <svg class="twitter-logo-icon" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                </svg>
+                                <h3>Compose Tweet</h3>
+                            </div>
+                            <button id="btn-auto-draft" class="btn-text-link" title="Regenerate automatic summary for the tweet">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 4px;">
+                                    <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.56-.56" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                </svg>
+                                Auto-Draft
+                            </button>
+                        </div>
+                        
+                        <div class="textarea-container">
+                            <textarea id="tweet-textarea" placeholder="What would you like to tweet about this update?" maxlength="1000"></textarea>
+                        </div>
+
+                        <div class="composer-footer">
+                            <div class="char-counter" id="char-counter">
+                                <span id="char-count">0</span> / 280
+                            </div>
+                            <div class="composer-buttons">
+                                <button id="btn-copy-tweet" class="btn btn-secondary btn-sm" title="Copy tweet content to clipboard">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                    <span>Copy</span>
+                                </button>
+                                <button id="btn-tweet" class="btn btn-primary" title="Post to X (Twitter)">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                                    </svg>
+                                    <span>Post Tweet</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast" class="toast" style="display: none;">
+        <span id="toast-message">Message copied!</span>
+    </div>
+
+    <!-- JS Application code -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
